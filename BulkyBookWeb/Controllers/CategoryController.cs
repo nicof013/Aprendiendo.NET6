@@ -40,5 +40,36 @@ namespace BulkyBookWeb.Controllers
             }
             return View(obj);
         }
+
+        public IActionResult Edit(int? id)
+        {
+            if (id == null || id == 0)
+                return NotFound();
+
+
+            var categorieFromDb = _db.Categories.Find(id);
+            if (categorieFromDb == null)
+                return NotFound();
+
+
+            return View(categorieFromDb);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Category obj)
+        {
+            if (obj.Name == obj.DisplayOrder.ToString())
+                ModelState.AddModelError("name", "The DisplayOrder cannot exactcly match the Name.");
+
+
+            if (ModelState.IsValid)
+            {
+                _db.Categories.Update(obj);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(obj);
+        }
     }
 }
